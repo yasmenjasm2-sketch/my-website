@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Senpa.io Clone Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Senpa.io Engine - Pro Zoom</title>
 <style>
     body { margin: 0; overflow: hidden; background: #0b0b0b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
     canvas { display: block; }
@@ -63,6 +63,12 @@
         font-weight: bold; font-size: 18px; pointer-events: none; text-shadow: 1px 1px 2px #000;
         text-align: left;
     }
+    
+    /* تعليمات الزوم */
+    #zoom-hint {
+        position: absolute; bottom: 10px; right: 10px; color: rgba(255,255,255,0.5);
+        font-size: 12px; pointer-events: none;
+    }
 </style>
 </head>
 <body>
@@ -103,6 +109,8 @@
     FPS: <span id="fps">0</span>
 </div>
 
+<div id="zoom-hint">Scroll to Zoom</div>
+
 <canvas id="gameCanvas"></canvas>
 
 <script>
@@ -116,6 +124,7 @@ let gameState = {
     width: 6000, // حجم الخريطة
     height: 6000,
     camera: { x: 0, y: 0, zoom: 1 },
+    userZoomMultiplier: 1.0, // متغير جديد للتحكم اليدوي بالزوم
     mouseX: 0,
     mouseY: 0
 };
@@ -148,6 +157,8 @@ let lastTime = 0;
 let skinImage = null;
 let playerConfig = { name: "Player", color: "#00d2ff" };
 let isFrozen = false;
+let fpsCounter = 0;
+let lastFpsTime = 0;
 
 // --- فئات الفيزياء ---
 
@@ -186,7 +197,6 @@ class PlayerCell extends Node {
         }
 
         // الفيزياء (الاحتكاك والسرعة)
-        // الخلايا الأصغر أسرع
         let speed = 2.2 * Math.pow(this.size, -0.439) * 40; 
         
         // تحويل الماوس إلى إحداثيات عالمية
@@ -201,15 +211,14 @@ class PlayerCell extends Node {
         
         // التسارع نحو الماوس
         if (dist > 0) {
-            this.vx += (dx / dist) * speed * 0.15; // التسارع
+            this.vx += (dx / dist) * speed * 0.15;
             this.vy += (dy / dist) * speed * 0.15;
         }
 
-        // الاحتكاك (مهم جداً لمحاكاة الانقسام)
+        // الاحتكاك
         let friction = 0.9; 
-        // إذا كان هناك سرعة انقسام عالية، نطبق احتكاك مختلف
         if (Math.sqrt(this.vx*this.vx + this.vy*this.vy) > speed * 2) {
-             friction = 0.85; // تباطؤ سريع بعد الانقسام
+             friction = 0.85; 
         }
 
         this.vx *= friction;
@@ -259,14 +268,14 @@ class PlayerCell extends Node {
 class EjectedMass extends Node {
     constructor(x, y, size, color, dirX, dirY) {
         super(x, y, size, color);
-        let speed = 45; // سرعة الإطلاق
+        let speed = 45; 
         this.vx = dirX * speed;
         this.vy = dirY * speed;
     }
     move() {
         this.x += this.vx;
         this.y += this.vy;
-        this.vx *= 0.85; // احتكاك قوي للتوقف
+        this.vx *= 0.85; 
         this.vy *= 0.85;
     }
     draw() {
@@ -286,17 +295,14 @@ function initGame() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
-    // إعادة تعيين
     nodes.player = [];
     nodes.food = [];
     nodes.ejected = [];
     
-    // إنشاء اللاعب
     let startX = Math.random() * gameState.width;
     let startY = Math.random() * gameState.height;
     nodes.player.push(new PlayerCell(startX, startY, 50, playerConfig.color, playerConfig.name));
     
-    // إنشاء طعام
     for(let i=0; i<1500; i++) spawnFood();
 
     document.getElementById("ui-container").style.display = "none";
@@ -307,13 +313,11 @@ function initGame() {
 function spawnFood() {
     let x = Math.random() * gameState.width;
     let y = Math.random() * gameState.height;
-    // لون عشوائي
     let colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff"];
     let color = colors[Math.floor(Math.random() * colors.length)];
-    nodes.food.push(new Node(x, y, Math.random()*5 + 10, color)); // حجم عشوائي للطعام
+    nodes.food.push(new Node(x, y, Math.random()*5 + 10, color));
 }
 
-// منطق التصادم بين خلايا اللاعب (أهم جزء في فيزياء senpa)
 function resolvePlayerCollisions() {
     let cells = nodes.player;
     for (let i = 0; i < cells.length; i++) {
@@ -324,30 +328,20 @@ function resolvePlayerCollisions() {
             let dx = c1.x - c2.x;
             let dy = c1.y - c2.y;
             let dist = Math.sqrt(dx*dx + dy*dy);
-            let minDist = c1.size + c2.size; // المسافة المطلوبة لعدم التداخل
+            let minDist = c1.size + c2.size;
 
-            // إذا تداخلوا
             if (dist < minDist) {
-                // هل يمكنهم الاندماج؟
                 if (c1.canMerge && c2.canMerge) {
-                    // الاندماج: الأكبر يأكل الأصغر
                     c1.setMass(c1.mass + c2.mass);
                     c2.deleted = true;
-                    // تأثير بصري بسيط
                     continue;
                 } 
                 
-                // إذا لم يمكن الاندماج، ادفعهم بعيداً عن بعض (Physics Push)
-                // قوة الدفع تعتمد على المسافة
                 let penetration = minDist - dist;
                 if (penetration > 0) {
                     let fx = dx / dist;
                     let fy = dy / dist;
-                    
-                    // توزيع القوة
-                    // معامل القوة 1.0 يعني صلب جداً، 0.5 يعني ناعم
                     let force = 0.8; 
-                    
                     c1.x += fx * penetration * force * 0.5;
                     c1.y += fy * penetration * force * 0.5;
                     c2.x -= fx * penetration * force * 0.5;
@@ -356,17 +350,15 @@ function resolvePlayerCollisions() {
             }
         }
     }
-    // إزالة الخلايا المندمجة
     nodes.player = nodes.player.filter(c => !c.deleted);
 }
 
 function splitCell() {
     let newCells = [];
     nodes.player.forEach(cell => {
-        if (nodes.player.length + newCells.length >= 16) return; // الحد الأقصى 16
-        if (cell.mass < 350) return; // أقل كتلة للانقسام
+        if (nodes.player.length + newCells.length >= 16) return; 
+        if (cell.mass < 350) return; 
 
-        // اتجاه الانطلاق
         let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
         let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
         let dx = targetX - cell.x;
@@ -376,19 +368,16 @@ function splitCell() {
         let dirX = dx/dist;
         let dirY = dy/dist;
 
-        // إنشاء خلية جديدة بنصف الكتلة
         let newMass = cell.mass / 2;
         cell.setMass(newMass);
         
         let splitC = new PlayerCell(cell.x, cell.y, cell.size, cell.color, cell.name);
         splitC.setMass(newMass);
         
-        // **الفيزياء:** دفعة قوية للأمام (Boost)
-        let splitSpeed = 65; // سرعة الانقسام
+        let splitSpeed = 65; 
         splitC.vx = cell.vx + dirX * splitSpeed;
         splitC.vy = cell.vy + dirY * splitSpeed;
         
-        // إعادة تعيين وقت الاندماج
         cell.canMerge = false;
         splitC.canMerge = false;
         cell.mergeTime = Date.now() + 15000;
@@ -411,10 +400,8 @@ function ejectMass() {
         let dirX = dx/dist;
         let dirY = dy/dist;
 
-        // فقدان الكتلة
         cell.setMass(cell.mass - 18);
         
-        // إنشاء الـ Pellet
         let ejectPos = {
             x: cell.x + dirX * cell.size,
             y: cell.y + dirY * cell.size
@@ -426,9 +413,17 @@ function ejectMass() {
 
 // --- حلقة اللعبة (Game Loop) ---
 
-function loop() {
+function loop(timestamp) {
     if (!gameState.running) return;
     
+    // حساب FPS
+    if (timestamp - lastFpsTime >= 1000) {
+        document.getElementById("fps").innerText = fpsCounter;
+        fpsCounter = 0;
+        lastFpsTime = timestamp;
+    }
+    fpsCounter++;
+
     // مسح الشاشة
     ctx.fillStyle = "#111";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -440,55 +435,64 @@ function loop() {
         avgY += p.y;
         totalMass += p.mass;
     });
+    
     if (nodes.player.length > 0) {
         gameState.camera.x = avgX / nodes.player.length;
         gameState.camera.y = avgY / nodes.player.length;
         
-        // الزووم بناء على الحجم الكلي
-        let targetZoom = 1 / Math.pow(Math.min(64 / 50, totalMass / 500), 0.4);
-        targetZoom = Math.max(0.1, Math.min(1, targetZoom)); // قيود الزووم
-        gameState.camera.zoom += (targetZoom - gameState.camera.zoom) * 0.05; // نعومة الزووم
+        // 1. حساب الزوم التلقائي بناءً على حجم اللاعب
+        let autoZoom = 1 / Math.pow(Math.min(64 / 50, totalMass / 500), 0.4);
+        
+        // 2. دمج الزوم التلقائي مع تحكم المستخدم (عجلة الماوس)
+        let finalTargetZoom = autoZoom * gameState.userZoomMultiplier;
+
+        // 3. تقييد الزوم النهائي (حماية من الشاشة السوداء أو الاقتراب المفرط)
+        finalTargetZoom = Math.max(0.05, Math.min(1.5, finalTargetZoom));
+
+        // 4. تطبيق التنعيم (Smoothing)
+        gameState.camera.zoom += (finalTargetZoom - gameState.camera.zoom) * 0.1;
     }
 
-    // حفظ السياق وتطبيق الكاميرا
+    // تطبيق الكاميرا
     ctx.save();
     ctx.translate(canvas.width/2, canvas.height/2);
     ctx.scale(gameState.camera.zoom, gameState.camera.zoom);
     ctx.translate(-gameState.camera.x, -gameState.camera.y);
 
-    // رسم الخلفية (الشبكة)
     drawGrid();
 
-    // تحديث ورسم الطعام
+    // الطعام
     nodes.food.forEach((f, i) => {
-        // رسم
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
-        ctx.fillStyle = f.color;
-        ctx.fill();
+        // تحسين الأداء: رسم الطعام داخل الشاشة فقط
+        let screenLeft = gameState.camera.x - (canvas.width/2)/gameState.camera.zoom;
+        let screenRight = gameState.camera.x + (canvas.width/2)/gameState.camera.zoom;
+        let screenTop = gameState.camera.y - (canvas.height/2)/gameState.camera.zoom;
+        let screenBottom = gameState.camera.y + (canvas.height/2)/gameState.camera.zoom;
+
+        if (f.x >= screenLeft - 50 && f.x <= screenRight + 50 &&
+            f.y >= screenTop - 50 && f.y <= screenBottom + 50) {
+            
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
+            ctx.fillStyle = f.color;
+            ctx.fill();
+        }
         
-        // أكل الطعام
         nodes.player.forEach(p => {
             let dist = Math.hypot(p.x - f.x, p.y - f.y);
-            if (dist < p.size) { // إذا تلامس
-                p.setMass(p.mass + 3); // زيادة الكتلة
+            if (dist < p.size) {
+                p.setMass(p.mass + 3);
                 nodes.food.splice(i, 1);
                 spawnFood();
             }
         });
     });
 
-    // تحديث ورسم Ejected Mass
+    // الكتل المقذوفة
     nodes.ejected.forEach((e, i) => {
         e.move();
         e.draw();
         
-        // انتهاء صلاحية الـ W
-        if (Math.abs(e.vx) < 0.1 && Math.abs(e.vy) < 0.1) {
-             // يمكن تحويله لطعام عادي أو إبقاؤه
-        }
-        
-        // الأكل بواسطة اللاعبين
         nodes.player.forEach(p => {
             let dist = Math.hypot(p.x - e.x, p.y - e.y);
             if (dist < p.size && p.mass > e.mass * 1.25) {
@@ -498,23 +502,21 @@ function loop() {
         });
     });
 
-    // تحديث ورسم اللاعب
+    // اللاعب
     resolvePlayerCollisions();
     nodes.player.forEach(p => {
         p.move();
         p.draw();
-        // تلاشي الكتلة تدريجياً
         if (p.mass > 200) p.mass *= 0.9998; 
     });
 
-    // رسم الحدود
+    // الحدود
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 50;
     ctx.strokeRect(0, 0, gameState.width, gameState.height);
 
     ctx.restore();
 
-    // تحديث الإحصائيات
     document.getElementById("score").innerText = Math.floor(totalMass);
     requestAnimationFrame(loop);
 }
@@ -524,7 +526,6 @@ function drawGrid() {
     ctx.lineWidth = 2;
     let step = 100;
     
-    // تحسين الأداء: رسم الشبكة الظاهرة فقط
     let startX = Math.floor((gameState.camera.x - (canvas.width/2)/gameState.camera.zoom) / step) * step;
     let endX = startX + (canvas.width / gameState.camera.zoom) + step*2;
     let startY = Math.floor((gameState.camera.y - (canvas.height/2)/gameState.camera.zoom) / step) * step;
@@ -544,36 +545,48 @@ function drawGrid() {
 
 // --- التحكم والإعدادات ---
 
-// تتبع الماوس
+// 1. تتبع الماوس
 window.addEventListener('mousemove', (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
 });
 
-// لوحة المفاتيح
+// 2. التحكم بالزوم (جديد)
+window.addEventListener('wheel', (e) => {
+    if (!gameState.running) return;
+    
+    // e.deltaY سالب يعني للأعلى (تكبير)، موجب يعني للأسفل (تصغير)
+    let zoomSpeed = 0.1; // سرعة التغيير
+    
+    if (e.deltaY < 0) {
+        // تكبير (Zoom In)
+        gameState.userZoomMultiplier *= 1.1; 
+    } else {
+        // تصغير (Zoom Out)
+        gameState.userZoomMultiplier *= 0.9;
+    }
+
+    // وضع حدود للمضاعف (حتى لا يصبح الزوم لانهائي)
+    // 0.25 = بعيد جداً، 4.0 = قريب جداً
+    gameState.userZoomMultiplier = Math.max(0.25, Math.min(4.0, gameState.userZoomMultiplier));
+
+}, { passive: true });
+
+// 3. لوحة المفاتيح
 window.addEventListener('keydown', (e) => {
     if (!gameState.running) return;
     
     let code = e.code;
     
-    if (code === controls.split) {
-        splitCell();
-    }
-    
-    if (code === controls.feed) {
-        ejectMass();
-    }
-    
+    if (code === controls.split) splitCell();
+    if (code === controls.feed) ejectMass();
     if (code === controls.macro) {
         if (!macroInterval) {
-            ejectMass(); // إطلاق فوري
-            macroInterval = setInterval(ejectMass, 40); // 25 طلقة في الثانية (سريع جداً)
+            ejectMass();
+            macroInterval = setInterval(ejectMass, 40);
         }
     }
-
-    if (code === controls.freeze) {
-        isFrozen = !isFrozen;
-    }
+    if (code === controls.freeze) isFrozen = !isFrozen;
 });
 
 window.addEventListener('keyup', (e) => {
@@ -583,7 +596,6 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-// تغيير حجم الشاشة
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -591,7 +603,6 @@ window.addEventListener('resize', () => {
 
 // --- دوال واجهة المستخدم ---
 
-// 1. زر البدء
 document.getElementById("play-btn").onclick = () => {
     let name = document.getElementById("nickname").value || "SenpaUser";
     let url = document.getElementById("skin-url").value;
@@ -604,7 +615,6 @@ document.getElementById("play-btn").onclick = () => {
     initGame();
 };
 
-// 2. زر الإعدادات
 document.getElementById("settings-btn").onclick = () => {
     document.getElementById("settings-menu").style.display = "block";
     updateBtnLabels();
@@ -615,7 +625,6 @@ document.getElementById("close-settings").onclick = () => {
     localStorage.setItem('senpaControls', JSON.stringify(controls));
 };
 
-// 3. تغيير الأزرار
 let listeningFor = null;
 
 function bindKey(action) {
@@ -633,7 +642,7 @@ window.addEventListener('keydown', (e) => {
         listeningFor = null;
         updateBtnLabels();
     }
-}, true); // Use capture phase to prevent game triggering
+}, true);
 
 function updateBtnLabels() {
     document.getElementById("btn-split").innerText = controls.split;
@@ -642,15 +651,12 @@ function updateBtnLabels() {
     document.getElementById("btn-freeze").innerText = controls.freeze;
 }
 
-// دالة مساعدة للألوان
 function adjustColor(color, amount) {
     return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
 }
 
-// دالة مبدئية لتحديث نص الأزرار عند التحميل
 updateBtnLabels();
 
 </script>
 </body>
 </html>
-ج
