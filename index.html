@@ -3,580 +3,350 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Senpa Pro Engine - Shotgun Macro</title>
+<title>Senpa Pro Engine - Ultra Edition</title>
 <style>
-    body { margin: 0; overflow: hidden; background: #0b0b0b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+    body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; user-select: none; }
     canvas { display: block; }
     
-    /* واجهة المستخدم */
+    /* واجهة القائمة */
     #ui-container {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.7); z-index: 10; backdrop-filter: blur(5px);
+        background: rgba(0,0,0,0.8); z-index: 10;
     }
     
     .menu-box {
-        background: #141414; padding: 30px; border-radius: 15px;
-        box-shadow: 0 0 30px rgba(0,210,255,0.2); text-align: center;
-        width: 350px; color: #fff; border: 1px solid #333;
+        background: #111; padding: 30px; border-radius: 20px;
+        box-shadow: 0 0 40px #00d2ff33; text-align: center;
+        width: 380px; color: #fff; border: 1px solid #222;
     }
     
-    h1 { margin: 0 0 20px; color: #00d2ff; text-transform: uppercase; font-size: 28px; letter-spacing: 2px; }
-    
-    input, button {
-        width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px;
-        border: none; outline: none; font-size: 16px; box-sizing: border-box; transition: 0.3s;
-    }
-    
-    input { background: #222; color: #fff; border: 1px solid #333; }
-    input:focus { border-color: #00d2ff; background: #2a2a2a; }
-    
-    button { cursor: pointer; font-weight: bold; }
-    
-    #play-btn { background: linear-gradient(90deg, #00d2ff, #007bff); color: #fff; margin-top: 20px; }
-    #play-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,210,255,0.4); }
-    
-    #settings-btn { background: #333; color: #ddd; }
-    #settings-btn:hover { background: #444; }
+    h1 { margin: 0 0 20px; color: #00d2ff; text-transform: uppercase; letter-spacing: 3px; font-size: 30px; }
+    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; box-sizing: border-box; }
+    input { background: #1a1a1a; color: #fff; border: 1px solid #333; }
+    button { cursor: pointer; font-weight: bold; transition: 0.3s; }
+    #play-btn { background: #00d2ff; color: #000; }
+    #play-btn:hover { background: #fff; }
+    #settings-btn { background: #333; color: #fff; }
 
     /* قائمة الإعدادات */
     #settings-menu {
         display: none; position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%); background: #141414;
-        padding: 25px; border-radius: 10px; z-index: 20;
-        width: 320px; color: #fff; border: 1px solid #00d2ff;
-        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        transform: translate(-50%, -50%); background: #111;
+        padding: 30px; border-radius: 15px; z-index: 20;
+        width: 350px; color: #fff; border: 2px solid #00d2ff;
     }
-    
-    .key-bind {
-        display: flex; justify-content: space-between; align-items: center;
-        margin: 12px 0; background: #1f1f1f; padding: 10px; border-radius: 5px;
-    }
-    
-    .key-btn {
-        background: #333; color: #00d2ff; width: auto; padding: 5px 20px; margin: 0;
-    }
-    .key-btn.listening { background: #ff0055; color: #fff; }
+    .key-bind { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; }
+    .key-btn { background: #222; color: #ffeb3b; width: 120px; padding: 8px; text-align: center; border: 1px solid #444; }
+    .key-btn.listening { background: #f44336; color: #fff; }
+    #close-settings { background: #00d2ff; color: #000; margin-top: 20px; }
 
-    #close-settings { background: #d32f2f; color: white; margin-top: 15px; }
-
-    /* المعلومات */
-    #stats {
-        position: absolute; top: 15px; left: 15px; color: #fff;
-        font-family: monospace; font-size: 16px; pointer-events: none; 
-        text-shadow: 1px 1px 2px #000; text-align: left;
-    }
-    
-    #zoom-hint {
-        position: absolute; bottom: 15px; right: 15px; color: rgba(255,255,255,0.4);
-        font-size: 11px; pointer-events: none; font-family: monospace;
-    }
+    #stats { position: absolute; top: 20px; left: 20px; color: #00d2ff; font-family: monospace; font-size: 18px; pointer-events: none; }
 </style>
 </head>
 <body>
 
 <div id="ui-container">
     <div class="menu-box">
-        <h1>Senpa Pro</h1>
-        <input id="nickname" placeholder="اسم اللاعب" maxlength="15" onkeydown="checkEnter(event)">
-        <input id="skin-url" placeholder="رابط السكن (اختياري)" onkeydown="checkEnter(event)">
-        <button id="play-btn">START GAME</button>
-        <button id="settings-btn">SETTINGS</button>
+        <h1>SENPA ULTRA</h1>
+        <input id="nickname" placeholder="اسمك البطولي" maxlength="15">
+        <input id="skin-url" placeholder="رابط السكن">
+        <button id="play-btn">ابدأ الهجوم</button>
+        <button id="settings-btn">تخصيص الأزرار</button>
     </div>
 </div>
 
 <div id="settings-menu">
-    <h3 style="text-align: center; margin-top:0; color:#00d2ff">Controls</h3>
-    <div class="key-bind">
-        <span>Split (انقسام)</span>
-        <button class="key-btn" id="btn-split" onclick="bindKey('split')">Space</button>
-    </div>
-    <div class="key-bind">
-        <span>Feed (طلقة واحدة)</span>
-        <button class="key-btn" id="btn-feed" onclick="bindKey('feed')">W</button>
-    </div>
-    <div class="key-bind">
-        <span>Macro (رشاش سريع)</span>
-        <button class="key-btn" id="btn-macro" onclick="bindKey('macro')">E</button>
-    </div>
-    <div class="key-bind">
-        <span>Freeze (تجميد)</span>
-        <button class="key-btn" id="btn-freeze" onclick="bindKey('freeze')">F</button>
-    </div>
-    <button id="close-settings">Save & Close</button>
+    <h3 style="text-align: center; color: #00d2ff;">تخصيck الأزرار</h3>
+    <div class="key-bind"><span>إطلاق هجوم (Enter)</span><button class="key-btn" id="btn-special" onclick="bindKey('special')">Enter</button></div>
+    <div class="key-bind"><span>ماكرو 80 حبة</span><button class="key-btn" id="btn-macro" onclick="bindKey('macro')">E</button></div>
+    <div class="key-bind"><span>انقسام عادي</span><button class="key-btn" id="btn-split" onclick="bindKey('split')">Space</button></div>
+    <div class="key-bind"><span>إطلاق مفرد</span><button class="key-btn" id="btn-feed" onclick="bindKey('feed')">W</button></div>
+    <button id="close-settings">حفظ</button>
 </div>
 
-<div id="stats">
-    Mass: <span id="score">0</span><br>
-    FPS: <span id="fps">0</span>
-</div>
-
-<div id="zoom-hint">Scroll to Zoom | E for Burst Macro</div>
+<div id="stats">Mass: <span id="score">0</span> | الأجزاء: <span id="cell-count">0</span></div>
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// --- إعدادات المحرك ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// حالة اللعبة
-let gameState = {
-    running: false,
-    width: 6000, 
-    height: 6000,
-    camera: { x: 0, y: 0, zoom: 1 },
-    userZoomMultiplier: 1.0,
-    mouseX: 0,
-    mouseY: 0
-};
-
-// التحكم الافتراضي
-let controls = {
-    split: 'Space',
-    feed: 'KeyW',
-    macro: 'KeyE',
-    freeze: 'KeyF'
-};
+let gameState = { running: false, width: 8000, height: 8000, camera: { x: 0, y: 0, zoom: 1 } };
+let controls = { special: 'Enter', macro: 'KeyE', split: 'Space', feed: 'KeyW' };
 
 // استرجاع الإعدادات
-if(localStorage.getItem('senpaControls')) {
-    controls = JSON.parse(localStorage.getItem('senpaControls'));
-}
+if(localStorage.getItem('senpaUltraConfig')) controls = JSON.parse(localStorage.getItem('senpaUltraConfig'));
 
-let nodes = { player: [], food: [], ejected: [] };
+let nodes = { player: [], food: [], enemies: [] };
 let mouse = { x: 0, y: 0 };
 let skinImage = null;
-let playerConfig = { name: "Player", color: "#00d2ff" };
-let isFrozen = false;
-let fpsCounter = 0;
-let lastFpsTime = 0;
-
-// متغير للتحكم في الماكرو (Burst)
-let isBursting = false; 
-
-// --- الفئات (Classes) ---
+let isBursting = false;
 
 class Node {
     constructor(x, y, size, color) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.color = color;
-        this.mass = size * size / 100;
+        this.x = x; this.y = y; this.size = size; this.color = color;
+        this.mass = (size * size) / 100;
         this.deleted = false;
     }
     setMass(m) { this.mass = m; this.size = Math.sqrt(m * 100); }
 }
 
 class PlayerCell extends Node {
-    constructor(x, y, size, color, name) {
+    constructor(x, y, size, color, name, mergeDelay = 10000) {
         super(x, y, size, color);
         this.name = name;
-        this.vx = 0;
-        this.vy = 0;
-        this.mergeTime = Date.now() + 10000;
-        this.canMerge = false;
+        this.vx = 0; this.vy = 0;
+        // زمن الاندماج: الافتراضي 10 ثواني، لكن للهجوم الخاص 50 ثانية
+        this.mergeReadyTime = Date.now() + mergeDelay;
     }
 
     move() {
-        if(this.deleted) return;
-        if (!this.canMerge && Date.now() > this.mergeTime) this.canMerge = true;
-
-        // --- تعديل السرعة (إبطاء اللاعب) ---
-        // القيمة القديمة كانت تضرب في 40، الآن 18 لجعل الحركة ثقيلة واحترافية
-        let speedMult = 18; 
-        let speed = 1.8 * Math.pow(this.size, -0.44) * speedMult; 
-        
+        // حركة أبطأ وأكثر احترافية
+        let speed = 2.2 * Math.pow(this.size, -0.45) * 15; 
         let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
         let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
-
-        if (isFrozen) { targetX = this.x; targetY = this.y; }
 
         let dx = targetX - this.x;
         let dy = targetY - this.y;
         let dist = Math.sqrt(dx*dx + dy*dy);
-        
-        if (dist > 0) {
-            this.vx += (dx / dist) * speed * 0.15;
-            this.vy += (dy / dist) * speed * 0.15;
+
+        if (dist > 5) {
+            this.vx += (dx / dist) * speed * 0.1;
+            this.vy += (dy / dist) * speed * 0.1;
         }
 
-        // --- زيادة الاحتكاك ---
-        // القيمة 0.92 تجعل التوقف أسرع (تحكم أدق) بدلاً من الانزلاق
-        let friction = 0.92; 
-        this.vx *= friction;
-        this.vy *= friction;
-
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // الحدود
+        this.vx *= 0.93; // احتكاك عالي للتحكم
+        this.vy *= 0.93;
+        this.x += this.vx; this.y += this.vy;
+        
+        // حدود الخريطة
         this.x = Math.max(this.size, Math.min(gameState.width - this.size, this.x));
         this.y = Math.max(this.size, Math.min(gameState.height - this.size, this.y));
     }
 
     draw() {
+        ctx.save();
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
-        // إطار نيون
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = adjustColor(this.color, -40);
-        ctx.stroke();
-
-        if (skinImage) {
-            ctx.save();
-            ctx.clip();
-            ctx.drawImage(skinImage, this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
-            ctx.restore();
-        }
-
-        ctx.fillStyle = "#FFF";
-        ctx.font = "bold " + Math.max(12, this.size / 2.5) + "px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        // رسم حدود للإسم ليكون واضحاً
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#000";
-        ctx.strokeText(this.name, this.x, this.y);
-        ctx.fillText(this.name, this.x, this.y);
-        
-        ctx.font = Math.max(10, this.size / 4) + "px Arial";
-        ctx.fillText(Math.floor(this.mass), this.x, this.y + this.size/1.5);
-    }
-}
-
-class EjectedMass extends Node {
-    constructor(x, y, size, color, dirX, dirY) {
-        super(x, y, size, color);
-        // سرعة انطلاق الكتلة (سريعة جداً مثل الفيديو)
-        let ejectSpeed = 55; 
-        this.vx = dirX * ejectSpeed;
-        this.vy = dirY * ejectSpeed;
-    }
-    move() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= 0.88; // تباطؤ الكتلة المقذوفة
-        this.vy *= 0.88;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.strokeStyle = "#000";
+        ctx.strokeStyle = "#fff";
         ctx.lineWidth = 2;
         ctx.stroke();
-    }
-}
-
-// --- Logic ---
-
-function initGame() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    nodes.player = [];
-    nodes.food = [];
-    nodes.ejected = [];
-    
-    let startX = Math.random() * gameState.width;
-    let startY = Math.random() * gameState.height;
-    nodes.player.push(new PlayerCell(startX, startY, 50, playerConfig.color, playerConfig.name));
-    
-    for(let i=0; i<1500; i++) spawnFood();
-
-    document.getElementById("ui-container").style.display = "none";
-    gameState.running = true;
-    loop();
-}
-
-function spawnFood() {
-    let x = Math.random() * gameState.width;
-    let y = Math.random() * gameState.height;
-    let colors = ["#ff3333", "#33ff33", "#3333ff", "#ffff33", "#ff33ff"];
-    let color = colors[Math.floor(Math.random() * colors.length)];
-    nodes.food.push(new Node(x, y, Math.random()*5 + 10, color));
-}
-
-function resolvePlayerCollisions() {
-    let cells = nodes.player;
-    for (let i = 0; i < cells.length; i++) {
-        for (let j = i + 1; j < cells.length; j++) {
-            let c1 = cells[i];
-            let c2 = cells[j];
-            let dist = Math.hypot(c1.x - c2.x, c1.y - c2.y);
-            let minDist = c1.size + c2.size;
-
-            if (dist < minDist) {
-                if (c1.canMerge && c2.canMerge) {
-                    c1.setMass(c1.mass + c2.mass);
-                    c2.deleted = true;
-                } else {
-                    let penetration = minDist - dist;
-                    if (penetration > 0) {
-                        let fx = (c1.x - c2.x) / dist;
-                        let fy = (c1.y - c2.y) / dist;
-                        // قوة التنافر بين الخلايا
-                        c1.x += fx * penetration * 0.5;
-                        c1.y += fy * penetration * 0.5;
-                        c2.x -= fx * penetration * 0.5;
-                        c2.y -= fy * penetration * 0.5;
-                    }
-                }
-            }
+        
+        if (skinImage) {
+            ctx.clip();
+            ctx.drawImage(skinImage, this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
         }
+        ctx.restore();
+
+        // رسم الاسم والكتلة
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.font = `bold ${this.size/3}px Arial`;
+        ctx.fillText(Math.floor(this.mass), this.x, this.y + this.size/4);
     }
-    nodes.player = nodes.player.filter(c => !c.deleted);
 }
 
-function splitCell() {
-    let newCells = [];
-    nodes.player.forEach(cell => {
-        if (nodes.player.length + newCells.length >= 16) return;
-        if (cell.mass < 350) return;
-
-        let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
-        let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
-        let angle = Math.atan2(targetY - cell.y, targetX - cell.x);
-
-        let newMass = cell.mass / 2;
-        cell.setMass(newMass);
-        
-        let splitC = new PlayerCell(cell.x, cell.y, cell.size, cell.color, cell.name);
-        splitC.setMass(newMass);
-        
-        let splitSpeed = 70;
-        splitC.vx = cell.vx + Math.cos(angle) * splitSpeed;
-        splitC.vy = cell.vy + Math.sin(angle) * splitSpeed;
-        
-        cell.canMerge = false;
-        splitC.canMerge = false;
-        cell.mergeTime = Date.now() + 15000;
-        splitC.mergeTime = Date.now() + 15000;
-
-        newCells.push(splitC);
-    });
-    nodes.player = nodes.player.concat(newCells);
+// دالة الماكرو 80 حبة بضغطة واحدة
+function startMacro80() {
+    if (isBursting) return;
+    isBursting = true;
+    let count = 0;
+    let interval = setInterval(() => {
+        if (count >= 80 || !gameState.running) {
+            clearInterval(interval);
+            isBursting = false;
+            return;
+        }
+        ejectMass();
+        count++;
+    }, 5); // سرعة فائقة جداً (5 مللي ثانية)
 }
 
 function ejectMass() {
     nodes.player.forEach(cell => {
-        if (cell.mass < 200) return; // الحد الأدنى للإطلاق
-        
-        let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
-        let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
-        
-        let angle = Math.atan2(targetY - cell.y, targetX - cell.x);
-        
-        // عند استخدام الماكرو، نقلل الدقة قليلاً ليظهر مثل الفيديو (تأثير الشوت-غن)
-        if (isBursting) {
-            angle += (Math.random() - 0.5) * 0.05; 
-        }
-
-        cell.setMass(cell.mass - 18);
-        
-        let ejectPos = {
-            x: cell.x + Math.cos(angle) * cell.size,
-            y: cell.y + Math.sin(angle) * cell.size
-        };
-        
-        nodes.ejected.push(new EjectedMass(ejectPos.x, ejectPos.y, 10, cell.color, Math.cos(angle), Math.sin(angle)));
+        if (cell.mass < 150) return;
+        cell.setMass(cell.mass - 20);
+        // توليد طلقة (كتلة سكر)
+        let angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
+        let food = new Node(cell.x + Math.cos(angle)*cell.size, cell.y + Math.sin(angle)*cell.size, 15, cell.color);
+        nodes.food.push(food);
     });
 }
 
-// --- دالة الماكرو الاحترافي (SHOTGUN BURST) ---
-function triggerBurstMacro() {
-    // هذه الدالة تطلق 40 طلقة بشكل متتابع وسريع جداً بضغطة زر واحدة
-    let shotsFired = 0;
-    let maxShots = 40; // عدد الطلقات في الكبسة الواحدة
-    
-    isBursting = true;
-    
-    // نستخدم Interval سريع جداً (8ms)
-    let burstInt = setInterval(() => {
-        // التحقق من أن اللاعب لا يزال حياً ولديه كتلة
-        let hasMass = nodes.player.some(c => c.mass > 200);
+// دالة الإطلاق الخاص (Pop-Split) - 50 ثانية اندماج
+function specialAttack() {
+    let newCells = [];
+    nodes.player.forEach(cell => {
+        if (cell.mass < 500) return;
+        let angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
         
-        if (shotsFired < maxShots && hasMass && gameState.running) {
-            ejectMass();
-            shotsFired++;
-        } else {
-            clearInterval(burstInt);
-            isBursting = false;
-        }
-    }, 8); // سرعة الإطلاق (كلما قل الرقم زادت السرعة)
+        let splitMass = cell.mass / 2;
+        cell.setMass(splitMass);
+        
+        // الجزء الجديد يندمج بعد 50 ثانية (50000 مللي ثانية)
+        let child = new PlayerCell(cell.x, cell.y, cell.size, cell.color, cell.name, 50000);
+        child.setMass(splitMass);
+        child.vx = Math.cos(angle) * 60;
+        child.vy = Math.sin(angle) * 60;
+        newCells.push(child);
+    });
+    nodes.player = nodes.player.concat(newCells);
 }
 
-// --- حلقة اللعبة (Game Loop) ---
-
-function loop(timestamp) {
+// المحرك الرئيسي
+function loop() {
     if (!gameState.running) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    if (timestamp - lastFpsTime >= 1000) {
-        document.getElementById("fps").innerText = fpsCounter;
-        fpsCounter = 0;
-        lastFpsTime = timestamp;
-    }
-    fpsCounter++;
-
-    // مسح الخلفية
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // خلفية الشبكة
+    drawGrid();
 
     let totalMass = 0;
     let avgX = 0, avgY = 0;
-    nodes.player.forEach(p => { avgX += p.x; avgY += p.y; totalMass += p.mass; });
-    
+
+    // تحديث اللاعب
+    nodes.player.forEach((p, i) => {
+        p.move();
+        p.draw();
+        totalMass += p.mass;
+        avgX += p.x; avgY += p.y;
+
+        // أكل الطعام
+        nodes.food.forEach((f, fi) => {
+            let d = Math.hypot(p.x - f.x, p.y - f.y);
+            if (d < p.size) {
+                p.setMass(p.mass + (f.size/2));
+                nodes.food.splice(fi, 1);
+            }
+        });
+
+        // تصادم الأجزاء والاندماج
+        nodes.player.forEach((p2, i2) => {
+            if (i === i2) return;
+            let d = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (d < p.size + p2.size) {
+                // إذا مر وقت الاندماج (للإطلاق الخاص سيكون بعد 50 ثانية)
+                if (Date.now() > p.mergeReadyTime && Date.now() > p2.mergeReadyTime) {
+                    p.setMass(p.mass + p2.mass);
+                    nodes.player.splice(i2, 1);
+                } else {
+                    // تدافع فيزيائي إذا لم يحن وقت الاندماج
+                    let push = (p.size + p2.size - d) / 2;
+                    let ang = Math.atan2(p2.y - p.y, p2.x - p.x);
+                    p2.x += Math.cos(ang) * push;
+                    p2.y += Math.sin(ang) * push;
+                }
+            }
+        });
+    });
+
+    // كاميرا ناعمة
     if (nodes.player.length > 0) {
-        gameState.camera.x = avgX / nodes.player.length;
-        gameState.camera.y = avgY / nodes.player.length;
-        
-        let autoZoom = 1 / Math.pow(Math.min(64 / 50, totalMass / 500), 0.4);
-        let finalZoom = Math.max(0.05, Math.min(1.5, autoZoom * gameState.userZoomMultiplier));
-        gameState.camera.zoom += (finalZoom - gameState.camera.zoom) * 0.1;
+        gameState.camera.x += (avgX / nodes.player.length - gameState.camera.x) * 0.1;
+        gameState.camera.y += (avgY / nodes.player.length - gameState.camera.y) * 0.1;
     }
 
+    document.getElementById("score").innerText = Math.floor(totalMass);
+    document.getElementById("cell-count").innerText = nodes.player.length;
+    
+    // الحفاظ على الطعام
+    if (nodes.food.length < 500) spawnFood();
+
+    requestAnimationFrame(loop);
+}
+
+function spawnFood() {
+    nodes.food.push(new Node(Math.random()*gameState.width, Math.random()*gameState.height, 8, `hsl(${Math.random()*360}, 100%, 50%)`));
+}
+
+function drawGrid() {
     ctx.save();
     ctx.translate(canvas.width/2, canvas.height/2);
     ctx.scale(gameState.camera.zoom, gameState.camera.zoom);
     ctx.translate(-gameState.camera.x, -gameState.camera.y);
-
-    drawGrid();
-
-    // رسم الكائنات (فقط ما يظهر في الشاشة لتحسين الأداء)
-    let viewW = (canvas.width / gameState.camera.zoom);
-    let viewH = (canvas.height / gameState.camera.zoom);
     
-    nodes.food.forEach((f, i) => {
-        if (Math.abs(f.x - gameState.camera.x) < viewW && Math.abs(f.y - gameState.camera.y) < viewH) {
-            ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
-            ctx.fillStyle = f.color; ctx.fill();
-        }
-        nodes.player.forEach(p => {
-            if (Math.hypot(p.x - f.x, p.y - f.y) < p.size) {
-                p.setMass(p.mass + 3); nodes.food.splice(i, 1); spawnFood();
-            }
-        });
-    });
-
-    nodes.ejected.forEach((e, i) => {
-        e.move(); e.draw();
-        nodes.player.forEach(p => {
-            if (Math.hypot(p.x - e.x, p.y - e.y) < p.size && p.mass > e.mass * 1.25) {
-                p.setMass(p.mass + 15); nodes.ejected.splice(i, 1);
-            }
-        });
-    });
-
-    resolvePlayerCollisions();
-    nodes.player.forEach(p => {
-        p.move(); p.draw();
-        // تناقص الكتلة الطبيعي
-        if (p.mass > 200) p.mass *= 0.9998; 
-    });
-
-    // رسم حدود الخريطة
-    ctx.strokeStyle = "#333"; ctx.lineWidth = 50;
-    ctx.strokeRect(0, 0, gameState.width, gameState.height);
-    ctx.restore();
-
-    document.getElementById("score").innerText = Math.floor(totalMass);
-    requestAnimationFrame(loop);
-}
-
-function drawGrid() {
-    ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 2;
-    let step = 100;
-    let startX = Math.floor((gameState.camera.x - (canvas.width/2)/gameState.camera.zoom) / step) * step;
-    let endX = startX + (canvas.width / gameState.camera.zoom) + step*2;
-    let startY = Math.floor((gameState.camera.y - (canvas.height/2)/gameState.camera.zoom) / step) * step;
-    let endY = startY + (canvas.height / gameState.camera.zoom) + step*2;
-
-    ctx.beginPath();
-    for (let x = startX; x < endX; x += step) { ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
-    for (let y = startY; y < endY; y += step) { ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
-    ctx.stroke();
-}
-
-// --- المدخلات ---
-
-// ** حل مشكلة زر Enter **
-function checkEnter(e) {
-    if (e.key === "Enter") {
-        e.preventDefault(); // منع السلوك الافتراضي (إرسال النموذج)
-        document.getElementById("play-btn").click(); // محاكاة الضغط على زر اللعب
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+    for(let i=0; i<=gameState.width; i+=100) {
+        ctx.moveTo(i, 0); ctx.lineTo(i, gameState.height);
+        ctx.moveTo(0, i); ctx.lineTo(gameState.width, i);
     }
+    ctx.stroke();
+    ctx.restore();
+}
+
+// التحكم
+window.addEventListener('keydown', (e) => {
+    if (document.activeElement.tagName === "INPUT") return;
+    
+    if (listeningFor) {
+        controls[listeningFor] = e.code;
+        updateUI();
+        listeningFor = null;
+        localStorage.setItem('senpaUltraConfig', JSON.stringify(controls));
+        return;
+    }
+
+    if (e.code === controls.macro) startMacro80();
+    if (e.code === controls.special || e.key === "Enter") specialAttack();
+    if (e.code === controls.split) splitCell();
+    if (e.code === controls.feed) ejectMass();
+});
+
+function splitCell() {
+    // انقسام عادي (اندماج بعد 10 ثواني)
+    let newCells = [];
+    nodes.player.forEach(cell => {
+        if (cell.mass < 100 || nodes.player.length >= 16) return;
+        let angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
+        cell.setMass(cell.mass / 2);
+        let child = new PlayerCell(cell.x, cell.y, cell.size, cell.color, cell.name, 10000);
+        child.setMass(cell.mass);
+        child.vx = Math.cos(angle) * 50; child.vy = Math.sin(angle) * 50;
+        newCells.push(child);
+    });
+    nodes.player = nodes.player.concat(newCells);
+}
+
+// UI
+document.getElementById("play-btn").onclick = () => {
+    playerConfig = { name: document.getElementById("nickname").value || "Hero" };
+    let url = document.getElementById("skin-url").value;
+    if (url) { skinImage = new Image(); skinImage.src = url; }
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    nodes.player = [new PlayerCell(gameState.width/2, gameState.height/2, 50, "#00d2ff", playerConfig.name)];
+    document.getElementById("ui-container").style.display = "none";
+    gameState.running = true;
+    loop();
+};
+
+document.getElementById("settings-btn").onclick = () => document.getElementById("settings-menu").style.display = "block";
+document.getElementById("close-settings").onclick = () => document.getElementById("settings-menu").style.display = "none";
+
+let listeningFor = null;
+function bindKey(type) {
+    listeningFor = type;
+    document.getElementById('btn-'+type).innerText = "اضغط زر...";
+    document.getElementById('btn-'+type).classList.add('listening');
+}
+
+function updateUI() {
+    Object.keys(controls).forEach(k => {
+        let btn = document.getElementById('btn-'+k);
+        if(btn) {
+            btn.innerText = controls[k].replace('Key', '');
+            btn.classList.remove('listening');
+        }
+    });
 }
 
 window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
-window.addEventListener('wheel', (e) => {
-    if (!gameState.running) return;
-    gameState.userZoomMultiplier *= (e.deltaY < 0 ? 1.1 : 0.9);
-    gameState.userZoomMultiplier = Math.max(0.25, Math.min(4.0, gameState.userZoomMultiplier));
-}, { passive: true });
-
-window.addEventListener('keydown', (e) => {
-    // منع التحكم أثناء الكتابة في المدخلات
-    if (document.activeElement.tagName === "INPUT") return;
-    if (!gameState.running) return;
-    
-    let code = e.code;
-    
-    if (code === controls.split) splitCell();
-    if (code === controls.feed) ejectMass(); // طلقة واحدة عادية
-    
-    // ** تفعيل الماكرو الخارق **
-    if (code === controls.macro) {
-        if (!isBursting) triggerBurstMacro();
-    }
-    
-    if (code === controls.freeze) isFrozen = !isFrozen;
-});
-
-window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-
-// UI Handlers
-document.getElementById("play-btn").onclick = () => {
-    let name = document.getElementById("nickname").value || "ProPlayer";
-    let url = document.getElementById("skin-url").value;
-    playerConfig.name = name;
-    if (url) { skinImage = new Image(); skinImage.src = url; }
-    initGame();
-};
-
-document.getElementById("settings-btn").onclick = () => { document.getElementById("settings-menu").style.display = "block"; updateBtnLabels(); };
-document.getElementById("close-settings").onclick = () => { document.getElementById("settings-menu").style.display = "none"; localStorage.setItem('senpaControls', JSON.stringify(controls)); };
-
-let listeningFor = null;
-function bindKey(action) {
-    let btn = document.getElementById("btn-" + action);
-    btn.innerText = "Press Key...";
-    btn.classList.add("listening");
-    listeningFor = { action: action, btn: btn };
-}
-window.addEventListener('keydown', (e) => {
-    if (listeningFor) {
-        e.preventDefault();
-        controls[listeningFor.action] = e.code;
-        listeningFor.btn.classList.remove("listening");
-        listeningFor = null;
-        updateBtnLabels();
-    }
-}, true);
-
-function updateBtnLabels() {
-    document.getElementById("btn-split").innerText = controls.split;
-    document.getElementById("btn-feed").innerText = controls.feed;
-    document.getElementById("btn-macro").innerText = controls.macro;
-    document.getElementById("btn-freeze").innerText = controls.freeze;
-}
-function adjustColor(color, amount) {
-    return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
-}
-updateBtnLabels();
+updateUI();
 </script>
 </body>
 </html>
