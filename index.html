@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Senpa.io Engine - Pro Fixed</title>
+<title>Senpa Pro Engine - Shotgun Macro</title>
 <style>
     body { margin: 0; overflow: hidden; background: #0b0b0b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
     canvas { display: block; }
@@ -12,62 +12,64 @@
     #ui-container {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.6); z-index: 10;
+        background: rgba(0,0,0,0.7); z-index: 10; backdrop-filter: blur(5px);
     }
     
     .menu-box {
-        background: #1a1a1a; padding: 25px; border-radius: 12px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.8); text-align: center;
-        width: 350px; color: #fff; border: 2px solid #333;
+        background: #141414; padding: 30px; border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0,210,255,0.2); text-align: center;
+        width: 350px; color: #fff; border: 1px solid #333;
     }
     
-    h1 { margin: 0 0 15px; color: #00d2ff; text-transform: uppercase; font-size: 24px; }
+    h1 { margin: 0 0 20px; color: #00d2ff; text-transform: uppercase; font-size: 28px; letter-spacing: 2px; }
     
     input, button {
-        width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px;
-        border: none; outline: none; font-size: 16px; box-sizing: border-box;
+        width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px;
+        border: none; outline: none; font-size: 16px; box-sizing: border-box; transition: 0.3s;
     }
     
-    input { background: #333; color: #fff; border: 1px solid #444; }
-    input:focus { border-color: #00d2ff; }
+    input { background: #222; color: #fff; border: 1px solid #333; }
+    input:focus { border-color: #00d2ff; background: #2a2a2a; }
     
-    button { cursor: pointer; font-weight: bold; transition: 0.2s; }
+    button { cursor: pointer; font-weight: bold; }
     
-    #play-btn { background: #00d2ff; color: #000; margin-top: 15px; }
-    #play-btn:hover { background: #33e0ff; }
+    #play-btn { background: linear-gradient(90deg, #00d2ff, #007bff); color: #fff; margin-top: 20px; }
+    #play-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,210,255,0.4); }
     
-    #settings-btn { background: #444; color: #ddd; }
-    #settings-btn:hover { background: #555; }
+    #settings-btn { background: #333; color: #ddd; }
+    #settings-btn:hover { background: #444; }
 
     /* قائمة الإعدادات */
     #settings-menu {
         display: none; position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%); background: #1a1a1a;
-        padding: 20px; border-radius: 10px; z-index: 20;
-        width: 300px; color: #fff; border: 2px solid #00d2ff;
+        transform: translate(-50%, -50%); background: #141414;
+        padding: 25px; border-radius: 10px; z-index: 20;
+        width: 320px; color: #fff; border: 1px solid #00d2ff;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
     }
     
     .key-bind {
         display: flex; justify-content: space-between; align-items: center;
-        margin: 10px 0; background: #222; padding: 8px; border-radius: 4px;
+        margin: 12px 0; background: #1f1f1f; padding: 10px; border-radius: 5px;
     }
     
     .key-btn {
-        background: #333; color: yellow; width: auto; padding: 5px 15px;
+        background: #333; color: #00d2ff; width: auto; padding: 5px 20px; margin: 0;
     }
-    .key-btn.listening { background: #ff0000; color: #fff; }
+    .key-btn.listening { background: #ff0055; color: #fff; }
 
-    #close-settings { background: #c00; color: white; margin-top: 10px; }
+    #close-settings { background: #d32f2f; color: white; margin-top: 15px; }
 
+    /* المعلومات */
     #stats {
-        position: absolute; top: 10px; left: 10px; color: #fff;
-        font-weight: bold; font-size: 18px; pointer-events: none; text-shadow: 1px 1px 2px #000;
-        text-align: left;
+        position: absolute; top: 15px; left: 15px; color: #fff;
+        font-family: monospace; font-size: 16px; pointer-events: none; 
+        text-shadow: 1px 1px 2px #000; text-align: left;
     }
     
     #zoom-hint {
-        position: absolute; bottom: 10px; right: 10px; color: rgba(255,255,255,0.5);
-        font-size: 12px; pointer-events: none;
+        position: absolute; bottom: 15px; right: 15px; color: rgba(255,255,255,0.4);
+        font-size: 11px; pointer-events: none; font-family: monospace;
     }
 </style>
 </head>
@@ -75,51 +77,52 @@
 
 <div id="ui-container">
     <div class="menu-box">
-        <h1>Senpa Engine Pro</h1>
+        <h1>Senpa Pro</h1>
         <input id="nickname" placeholder="اسم اللاعب" maxlength="15" onkeydown="checkEnter(event)">
         <input id="skin-url" placeholder="رابط السكن (اختياري)" onkeydown="checkEnter(event)">
-        <button id="play-btn">ابدأ اللعب</button>
-        <button id="settings-btn">الإعدادات والتحكم</button>
+        <button id="play-btn">START GAME</button>
+        <button id="settings-btn">SETTINGS</button>
     </div>
 </div>
 
 <div id="settings-menu">
-    <h3 style="text-align: center; margin-top:0">إعدادات التحكم</h3>
+    <h3 style="text-align: center; margin-top:0; color:#00d2ff">Controls</h3>
     <div class="key-bind">
-        <span>الانقسام (Split)</span>
+        <span>Split (انقسام)</span>
         <button class="key-btn" id="btn-split" onclick="bindKey('split')">Space</button>
     </div>
     <div class="key-bind">
-        <span>إطلاق مفرد (Feed)</span>
+        <span>Feed (طلقة واحدة)</span>
         <button class="key-btn" id="btn-feed" onclick="bindKey('feed')">W</button>
     </div>
     <div class="key-bind">
-        <span>ماكرو خارق (Macro)</span>
+        <span>Macro (رشاش سريع)</span>
         <button class="key-btn" id="btn-macro" onclick="bindKey('macro')">E</button>
     </div>
     <div class="key-bind">
-        <span>تجميد الخلية (Freeze)</span>
+        <span>Freeze (تجميد)</span>
         <button class="key-btn" id="btn-freeze" onclick="bindKey('freeze')">F</button>
     </div>
-    <button id="close-settings">حفظ وإغلاق</button>
+    <button id="close-settings">Save & Close</button>
 </div>
 
 <div id="stats">
-    Score: <span id="score">0</span><br>
+    Mass: <span id="score">0</span><br>
     FPS: <span id="fps">0</span>
 </div>
 
-<div id="zoom-hint">Scroll to Zoom</div>
+<div id="zoom-hint">Scroll to Zoom | E for Burst Macro</div>
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// --- تهيئة المحرك ---
+// --- إعدادات المحرك ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// حالة اللعبة
 let gameState = {
     running: false,
-    width: 6000,
+    width: 6000, 
     height: 6000,
     camera: { x: 0, y: 0, zoom: 1 },
     userZoomMultiplier: 1.0,
@@ -127,6 +130,7 @@ let gameState = {
     mouseY: 0
 };
 
+// التحكم الافتراضي
 let controls = {
     split: 'Space',
     feed: 'KeyW',
@@ -134,6 +138,7 @@ let controls = {
     freeze: 'KeyF'
 };
 
+// استرجاع الإعدادات
 if(localStorage.getItem('senpaControls')) {
     controls = JSON.parse(localStorage.getItem('senpaControls'));
 }
@@ -146,10 +151,10 @@ let isFrozen = false;
 let fpsCounter = 0;
 let lastFpsTime = 0;
 
-// متغيرات الماكرو الجديد
-let isMacroFiring = false; 
+// متغير للتحكم في الماكرو (Burst)
+let isBursting = false; 
 
-// --- فئات اللعبة ---
+// --- الفئات (Classes) ---
 
 class Node {
     constructor(x, y, size, color) {
@@ -177,9 +182,10 @@ class PlayerCell extends Node {
         if(this.deleted) return;
         if (!this.canMerge && Date.now() > this.mergeTime) this.canMerge = true;
 
-        // **تعديل السرعة**: تم تقليل الأرقام هنا لجعل اللاعب أبطأ وأكثر ثقلاً
-        // الصيغة القديمة كانت تضرب في 40، الآن في 22
-        let speed = 1.8 * Math.pow(this.size, -0.44) * 22; 
+        // --- تعديل السرعة (إبطاء اللاعب) ---
+        // القيمة القديمة كانت تضرب في 40، الآن 18 لجعل الحركة ثقيلة واحترافية
+        let speedMult = 18; 
+        let speed = 1.8 * Math.pow(this.size, -0.44) * speedMult; 
         
         let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
         let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
@@ -195,7 +201,8 @@ class PlayerCell extends Node {
             this.vy += (dy / dist) * speed * 0.15;
         }
 
-        // زيادة الاحتكاك قليلاً لجعل التوقف أسرع (تحكم أدق)
+        // --- زيادة الاحتكاك ---
+        // القيمة 0.92 تجعل التوقف أسرع (تحكم أدق) بدلاً من الانزلاق
         let friction = 0.92; 
         this.vx *= friction;
         this.vy *= friction;
@@ -203,6 +210,7 @@ class PlayerCell extends Node {
         this.x += this.vx;
         this.y += this.vy;
 
+        // الحدود
         this.x = Math.max(this.size, Math.min(gameState.width - this.size, this.x));
         this.y = Math.max(this.size, Math.min(gameState.height - this.size, this.y));
     }
@@ -212,6 +220,7 @@ class PlayerCell extends Node {
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
+        // إطار نيون
         ctx.lineWidth = 5;
         ctx.strokeStyle = adjustColor(this.color, -40);
         ctx.stroke();
@@ -227,7 +236,9 @@ class PlayerCell extends Node {
         ctx.font = "bold " + Math.max(12, this.size / 2.5) + "px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
+        // رسم حدود للإسم ليكون واضحاً
         ctx.lineWidth = 3;
+        ctx.strokeStyle = "#000";
         ctx.strokeText(this.name, this.x, this.y);
         ctx.fillText(this.name, this.x, this.y);
         
@@ -239,16 +250,16 @@ class PlayerCell extends Node {
 class EjectedMass extends Node {
     constructor(x, y, size, color, dirX, dirY) {
         super(x, y, size, color);
-        // سرعة الإطلاق (W)
-        let speed = 50; 
-        this.vx = dirX * speed;
-        this.vy = dirY * speed;
+        // سرعة انطلاق الكتلة (سريعة جداً مثل الفيديو)
+        let ejectSpeed = 55; 
+        this.vx = dirX * ejectSpeed;
+        this.vy = dirY * ejectSpeed;
     }
     move() {
         this.x += this.vx;
         this.y += this.vy;
-        this.vx *= 0.85;
-        this.vy *= 0.85;
+        this.vx *= 0.88; // تباطؤ الكتلة المقذوفة
+        this.vy *= 0.88;
     }
     draw() {
         ctx.beginPath();
@@ -261,7 +272,7 @@ class EjectedMass extends Node {
     }
 }
 
-// --- وظائف اللعبة ---
+// --- Logic ---
 
 function initGame() {
     canvas.width = window.innerWidth;
@@ -284,7 +295,7 @@ function initGame() {
 function spawnFood() {
     let x = Math.random() * gameState.width;
     let y = Math.random() * gameState.height;
-    let colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff"];
+    let colors = ["#ff3333", "#33ff33", "#3333ff", "#ffff33", "#ff33ff"];
     let color = colors[Math.floor(Math.random() * colors.length)];
     nodes.food.push(new Node(x, y, Math.random()*5 + 10, color));
 }
@@ -307,10 +318,11 @@ function resolvePlayerCollisions() {
                     if (penetration > 0) {
                         let fx = (c1.x - c2.x) / dist;
                         let fy = (c1.y - c2.y) / dist;
-                        c1.x += fx * penetration * 0.4;
-                        c1.y += fy * penetration * 0.4;
-                        c2.x -= fx * penetration * 0.4;
-                        c2.y -= fy * penetration * 0.4;
+                        // قوة التنافر بين الخلايا
+                        c1.x += fx * penetration * 0.5;
+                        c1.y += fy * penetration * 0.5;
+                        c2.x -= fx * penetration * 0.5;
+                        c2.y -= fy * penetration * 0.5;
                     }
                 }
             }
@@ -335,7 +347,7 @@ function splitCell() {
         let splitC = new PlayerCell(cell.x, cell.y, cell.size, cell.color, cell.name);
         splitC.setMass(newMass);
         
-        let splitSpeed = 65;
+        let splitSpeed = 70;
         splitC.vx = cell.vx + Math.cos(angle) * splitSpeed;
         splitC.vy = cell.vy + Math.sin(angle) * splitSpeed;
         
@@ -351,54 +363,53 @@ function splitCell() {
 
 function ejectMass() {
     nodes.player.forEach(cell => {
-        if (cell.mass < 200) return;
+        if (cell.mass < 200) return; // الحد الأدنى للإطلاق
         
         let targetX = (mouse.x - canvas.width/2) / gameState.camera.zoom + gameState.camera.x;
         let targetY = (mouse.y - canvas.height/2) / gameState.camera.zoom + gameState.camera.y;
         
-        // زاوية الإطلاق
         let angle = Math.atan2(targetY - cell.y, targetX - cell.x);
         
-        // إضافة القليل من العشوائية للزاوية لجعل الماكرو يبدو طبيعياً (Shotgun Spread)
-        // إذا كان ماكرو سريع، نضيف انحراف بسيط
-        if(isMacroFiring) {
-            angle += (Math.random() - 0.5) * 0.1;
+        // عند استخدام الماكرو، نقلل الدقة قليلاً ليظهر مثل الفيديو (تأثير الشوت-غن)
+        if (isBursting) {
+            angle += (Math.random() - 0.5) * 0.05; 
         }
 
         cell.setMass(cell.mass - 18);
+        
         let ejectPos = {
             x: cell.x + Math.cos(angle) * cell.size,
             y: cell.y + Math.sin(angle) * cell.size
         };
+        
         nodes.ejected.push(new EjectedMass(ejectPos.x, ejectPos.y, 10, cell.color, Math.cos(angle), Math.sin(angle)));
     });
 }
 
-// **وظيفة الماكرو الجديدة (Burst)**
-function performMacroBurst() {
-    // نطلق 25 طلقة في دفعات سريعة جداً (تقريباً في نفس اللحظة)
-    let shots = 0;
-    let maxShots = 25; // عدد الطلقات في الكبسة الواحدة
+// --- دالة الماكرو الاحترافي (SHOTGUN BURST) ---
+function triggerBurstMacro() {
+    // هذه الدالة تطلق 40 طلقة بشكل متتابع وسريع جداً بضغطة زر واحدة
+    let shotsFired = 0;
+    let maxShots = 40; // عدد الطلقات في الكبسة الواحدة
     
-    isMacroFiring = true;
+    isBursting = true;
     
-    // نستخدم Loop سريع جداً بدلاً من SetInterval بطيء
-    // هذا سيطلق الرصاصات بشكل متتابع فائق السرعة
-    let burstInterval = setInterval(() => {
-        // التحقق من وجود كتلة كافية
+    // نستخدم Interval سريع جداً (8ms)
+    let burstInt = setInterval(() => {
+        // التحقق من أن اللاعب لا يزال حياً ولديه كتلة
         let hasMass = nodes.player.some(c => c.mass > 200);
         
-        if (shots < maxShots && hasMass) {
+        if (shotsFired < maxShots && hasMass && gameState.running) {
             ejectMass();
-            shots++;
+            shotsFired++;
         } else {
-            clearInterval(burstInterval);
-            isMacroFiring = false;
+            clearInterval(burstInt);
+            isBursting = false;
         }
-    }, 8); // تأخير 8ms بين كل طلقة (سريع جداً)
+    }, 8); // سرعة الإطلاق (كلما قل الرقم زادت السرعة)
 }
 
-// --- Main Loop ---
+// --- حلقة اللعبة (Game Loop) ---
 
 function loop(timestamp) {
     if (!gameState.running) return;
@@ -410,6 +421,7 @@ function loop(timestamp) {
     }
     fpsCounter++;
 
+    // مسح الخلفية
     ctx.fillStyle = "#111";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -421,7 +433,6 @@ function loop(timestamp) {
         gameState.camera.x = avgX / nodes.player.length;
         gameState.camera.y = avgY / nodes.player.length;
         
-        // معادلة الزوم
         let autoZoom = 1 / Math.pow(Math.min(64 / 50, totalMass / 500), 0.4);
         let finalZoom = Math.max(0.05, Math.min(1.5, autoZoom * gameState.userZoomMultiplier));
         gameState.camera.zoom += (finalZoom - gameState.camera.zoom) * 0.1;
@@ -434,7 +445,7 @@ function loop(timestamp) {
 
     drawGrid();
 
-    // رسم الطعام (تحسين الأداء)
+    // رسم الكائنات (فقط ما يظهر في الشاشة لتحسين الأداء)
     let viewW = (canvas.width / gameState.camera.zoom);
     let viewH = (canvas.height / gameState.camera.zoom);
     
@@ -462,9 +473,11 @@ function loop(timestamp) {
     resolvePlayerCollisions();
     nodes.player.forEach(p => {
         p.move(); p.draw();
-        if (p.mass > 200) p.mass *= 0.9998;
+        // تناقص الكتلة الطبيعي
+        if (p.mass > 200) p.mass *= 0.9998; 
     });
 
+    // رسم حدود الخريطة
     ctx.strokeStyle = "#333"; ctx.lineWidth = 50;
     ctx.strokeRect(0, 0, gameState.width, gameState.height);
     ctx.restore();
@@ -487,42 +500,37 @@ function drawGrid() {
     ctx.stroke();
 }
 
-// --- المدخلات والأحداث ---
+// --- المدخلات ---
 
-// 1. معالجة زر Enter في المدخلات (حل مشكلة التجميد)
+// ** حل مشكلة زر Enter **
 function checkEnter(e) {
     if (e.key === "Enter") {
-        document.getElementById("play-btn").click();
+        e.preventDefault(); // منع السلوك الافتراضي (إرسال النموذج)
+        document.getElementById("play-btn").click(); // محاكاة الضغط على زر اللعب
     }
 }
 
-// 2. تتبع الماوس
 window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
 
-// 3. تحكم الزوم (Wheel)
 window.addEventListener('wheel', (e) => {
     if (!gameState.running) return;
     gameState.userZoomMultiplier *= (e.deltaY < 0 ? 1.1 : 0.9);
     gameState.userZoomMultiplier = Math.max(0.25, Math.min(4.0, gameState.userZoomMultiplier));
 }, { passive: true });
 
-// 4. لوحة المفاتيح
 window.addEventListener('keydown', (e) => {
-    // تجاهل التحكم إذا كان المستخدم يكتب في مربع نص
+    // منع التحكم أثناء الكتابة في المدخلات
     if (document.activeElement.tagName === "INPUT") return;
-
     if (!gameState.running) return;
     
     let code = e.code;
     
     if (code === controls.split) splitCell();
-    if (code === controls.feed) ejectMass(); // طلقة واحدة
+    if (code === controls.feed) ejectMass(); // طلقة واحدة عادية
     
-    // الماكرو الجديد: كبسة واحدة = رشقة كاملة
+    // ** تفعيل الماكرو الخارق **
     if (code === controls.macro) {
-        if (!isMacroFiring) {
-            performMacroBurst();
-        }
+        if (!isBursting) triggerBurstMacro();
     }
     
     if (code === controls.freeze) isFrozen = !isFrozen;
@@ -530,9 +538,9 @@ window.addEventListener('keydown', (e) => {
 
 window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-// UI Setup
+// UI Handlers
 document.getElementById("play-btn").onclick = () => {
-    let name = document.getElementById("nickname").value || "SenpaUser";
+    let name = document.getElementById("nickname").value || "ProPlayer";
     let url = document.getElementById("skin-url").value;
     playerConfig.name = name;
     if (url) { skinImage = new Image(); skinImage.src = url; }
@@ -545,7 +553,7 @@ document.getElementById("close-settings").onclick = () => { document.getElementB
 let listeningFor = null;
 function bindKey(action) {
     let btn = document.getElementById("btn-" + action);
-    btn.innerText = "اضغط أي زر...";
+    btn.innerText = "Press Key...";
     btn.classList.add("listening");
     listeningFor = { action: action, btn: btn };
 }
