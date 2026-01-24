@@ -34,18 +34,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 20px 0;
-            margin-bottom: 10px;
+            gap: 10px;
+            padding: 25px 0;
+            margin-bottom: 5px;
         }
 
         .developer-name {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-family: sans-serif; /* لظهور الاسم الانجليزي بشكل جيد */
-            /* التدرج اللوني: أزرق -> أحمر غامق -> أزرق غامق */
+            font-family: sans-serif; 
             background: linear-gradient(270deg, #0000FF, #8B0000, #00008B, #0000FF);
             background-size: 300% 300%;
             -webkit-background-clip: text;
@@ -53,19 +52,21 @@
             animation: gradientAnim 4s ease infinite;
         }
 
-        /* أيقونة التوثيق الزرقاء */
+        /* تصميم علامة التوثيق الاحترافية (مطابقة للصورة) */
         .verified-badge {
-            color: #1DA1F2; /* لون تويتر الرسمي */
-            font-size: 1.3rem;
-            background: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 15px rgba(29, 161, 242, 0.5);
-            animation: pulse-blue 2s infinite;
+            width: 26px;
+            height: 26px;
+            filter: drop-shadow(0 0 8px rgba(29, 161, 242, 0.6));
+            animation: pulse-badge 2s infinite;
+        }
+
+        .verified-badge svg {
+            width: 100%;
+            height: 100%;
+            fill: #1DA1F2; /* لون التوثيق الأزرق */
         }
 
         @keyframes gradientAnim {
@@ -74,10 +75,10 @@
             100% { background-position: 0% 50%; }
         }
 
-        @keyframes pulse-blue {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(29, 161, 242, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(29, 161, 242, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(29, 161, 242, 0); }
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         /* الحاوية الرئيسية */
@@ -248,10 +249,16 @@
 <body>
 
     <div class="developer-header">
-        <span class="developer-name">Hamza Elhumada</span>
         <div class="verified-badge">
-            <i class="fas fa-check" style="font-size: 14px; color: #1DA1F2;"></i>
+            <svg viewBox="0 0 24 24" aria-label="Verified account">
+                <g>
+                    <path d="M22.5 12.5c0-1.58-.8-2.95-2.03-3.76.26-1.1.2-2.26-.18-3.28-1.1-.2-2.25-.13-3.27.17-.8-1.26-2.18-2.06-3.72-2.06s-2.92.8-3.72 2.06c-1.02-.3-2.17-.37-3.27-.17-.38 1.02-.44 2.18-.18 3.28-1.23.8-2.03 2.18-2.03 3.76 0 1.58.8 2.95 2.03 3.76-.26 1.1-.2 2.26.18 3.28 1.1.2 2.25.13 3.27-.17.8 1.26 2.18 2.06 3.72 2.06s2.92-.8 3.72-2.06c1.02.3 2.17.37 3.27.17.38-1.02.44-2.18.18-3.28 1.23-.8 2.03-2.18 2.03-3.76zm-11.23 4.1l-4.13-4.13 1.41-1.41 2.72 2.72 5.41-5.41 1.41 1.41-6.82 6.82z" fill="#fff"></path>
+                    <path d="M22.5 12.5c0-1.58-.8-2.95-2.03-3.76.26-1.1.2-2.26-.18-3.28-1.1-.2-2.25-.13-3.27.17-.8-1.26-2.18-2.06-3.72-2.06s-2.92.8-3.72 2.06c-1.02-.3-2.17-.37-3.27-.17-.38 1.02-.44 2.18-.18 3.28-1.23.8-2.03 2.18-2.03 3.76 0 1.58.8 2.95 2.03 3.76-.26 1.1-.2 2.26.18 3.28 1.1.2 2.25.13 3.27-.17.8 1.26 2.18 2.06 3.72 2.06s2.92-.8 3.72-2.06c1.02.3 2.17.37 3.27.17.38-1.02.44-2.18.18-3.28 1.23-.8 2.03-2.18 2.03-3.76zm-11.23 4.1l-4.13-4.13 1.41-1.41 2.72 2.72 5.41-5.41 1.41 1.41-6.82 6.82z" style="fill: #1DA1F2;"></path>
+                    <path d="M11.27 16.6l-4.13-4.13 1.41-1.41 2.72 2.72 5.41-5.41 1.41 1.41-6.82 6.82z" fill="#fff"></path>
+                </g>
+            </svg>
         </div>
+        <span class="developer-name">Hamza Elhumada</span>
     </div>
 
     <div class="container">
