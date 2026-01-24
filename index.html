@@ -1,18 +1,213 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>تحميل تطبيق FawakihAI</title>
-</head>
-<body style="text-align:center;font-family:sans-serif">
-  <h1>FawakihAI</h1>
-  <p>اضغط الزر لتحميل التطبيق</p>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FawakihAI - مخمن الفواكه الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* إعدادات عامة */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <a href="fawakihAI_3.1.1.apk" download>
-    <button style="font-size:20px;padding:15px">
-      تحميل التطبيق
-    </button>
-  </a>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #2c3e50 100%);
+            color: #ffffff;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.6;
+        }
+
+        /* الحاوية الرئيسية */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* العناوين */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        /* قسم النصوص والمعلومات */
+        .info-section {
+            text-align: right;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-section h3 {
+            color: #4facfe;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .info-section p {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        /* زر التحميل الرئيسي */
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(56, 239, 125, 0.6);
+        }
+
+        .download-btn i {
+            margin-left: 10px;
+        }
+
+        /* روابط التواصل الاجتماعي */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            transition: transform 0.3s;
+        }
+
+        .whatsapp {
+            background: #25D366;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+
+        .instagram {
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+            box-shadow: 0 4px 10px rgba(220, 39, 67, 0.3);
+        }
+
+        .social-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .contact-text {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* الحقوق والتذييل */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+        }
+        
+        footer strong {
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <i class="fas fa-apple-alt fa-3x" style="color:#38ef7d; margin-bottom:15px;"></i>
+        <h1>FawakihAI</h1>
+        <p class="subtitle">التطبيق الأول للتعرف على الفواكه بالذكاء الاصطناعي</p>
+
+        <a href="fawakihAI_3.1.1.apk" download class="download-btn">
+            <i class="fas fa-download"></i> حمل التطبيق الآن
+        </a>
+
+        <div class="info-section">
+            <h3>🥑 لماذا تطبيق FawakihAI؟</h3>
+            <p>
+                اكتشف عالم الطبيعة من خلال عدسة هاتفك! تطبيقنا يستخدم أحدث خوارزميات الذكاء الاصطناعي لتحليل الصور والتعرف على أي نوع من الفاكهة في ثوانٍ معدودة.
+            </p>
+            
+            <h3>🚀 مميزات التطبيق:</h3>
+            <ul style="list-style: none; padding-right: 10px;">
+                <li>✅ <strong>دقة عالية:</strong> نسبة تعرف تصل إلى 99%.</li>
+                <li>✅ <strong>معلومات غذائية:</strong> احصل على السعرات والفوائد لكل ثمرة.</li>
+                <li>✅ <strong>سهولة الاستخدام:</strong> واجهة بسيطة وسريعة تناسب الجميع.</li>
+                <li>✅ <strong>بدون إنترنت:</strong> يعمل وضع التخمين الأساسي دون الحاجة لاتصال.</li>
+            </ul>
+            <br>
+            <p>
+                سواء كنت خبير تغذية، بستانياً، أو مجرد محب للفواكه، فإن تطبيقنا هو رفيقك المثالي. انضم لآلاف المستخدمين اليوم!
+            </p>
+        </div>
+
+        <div class="contact-text">للاشتراك والدعم الفني تواصل معنا:</div>
+        <div class="social-links">
+            <a href="https://wsend.co/905424678123" target="_blank" class="social-btn whatsapp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.instagram.com/000n._?igsh=aHZuY3N5bzFzdmdi" target="_blank" class="social-btn instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>جميع الحقوق محفوظة © 2026 <strong>FawakihAI</strong></p>
+        <p>تم التصميم والتطوير بأعلى معايير الجودة</p>
+    </footer>
 
 </body>
 </html>
